@@ -39,12 +39,12 @@ public class UserController {
     public ResponseEntity<?> CreateAuthenticationToken(@RequestBody AuthenticationRequest request) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    request.getEmail(), request.getPassword()
+                    request.getUsername(), request.getPassword()
             ));
         } catch (BadCredentialsException e) {
             throw new Exception("Incorrect Username or password", e);
         }
-        final User userDetails = myUserDetailService.loadUserByUsername(request.getEmail());
+        final User userDetails = myUserDetailService.loadUserByUsername(request.getUsername());
         final String token = JwtUtil.generateToken(userDetails);
         final Date expirationDate = JwtUtil.extractExpiration(token);
         final Integer userId = userDetails.getId();

@@ -1,6 +1,7 @@
 package com.lian.joole.Security;
 
 
+import com.lian.joole.filters.JwtRequestFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @AllArgsConstructor
@@ -21,6 +23,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private MyUserDetailService userService;
 
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService).passwordEncoder(PasswordEncoder());
@@ -30,10 +34,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
-                .antMatchers("/", "/authenticate/*").permitAll().anyRequest()
+                .antMatchers( "/authenticate/*").permitAll().anyRequest()
                 .authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors()
                 .and()
                 .formLogin();
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
