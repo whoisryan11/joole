@@ -1,0 +1,63 @@
+package com.lian.joole.Controller;
+
+import com.lian.joole.Entity.User;
+import com.lian.joole.Requests.AuthenticationRequest;
+import com.lian.joole.Requests.RegisterRequest;
+import com.lian.joole.Security.AuthenticationResponse;
+import com.lian.joole.Security.MyUserDetailService;
+import com.lian.joole.Services.UserService;
+import com.lian.joole.Util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+
+@RestController
+public class UserController {
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private MyUserDetailService myUserDetailService;
+
+    @Autowired
+    private JwtUtil JwtUtil;
+
+    @RequestMapping("/")
+    public String sayHello(@RequestParam(value = "myName", defaultValue = "World") String name){
+        return String.format("Hello %s", name);
+    }
+
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    public ResponseEntity<?> CreateAuthenticationToken(@RequestBody AuthenticationRequest request) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    request.getEmail(), request.getPassword()
+            ));
+        } catch (BadCredentialsException e) {
+            throw new Exception("Incorrect Username or password", e);
+        }
+        final User userDetails = myUserDetailService.loadUserByUsername(request.getEmail());
+        final String token = JwtUtil.generateToken(userDetails);
+        final Date expirationDate = JwtUtil.extractExpiration(token);
+        final Integer userId = userDetails.getId();
+        return ResponseEntity.ok(new AuthenticationResponse(token,  expirationDate, userId));
+    }
+
+    @PostMapping("/registerUser")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) throws  Exception {
+        User newUser = userService.createUser(
+                request.getUsername(),
+                request.getPassword(),
+                request.getEmail()
+        );
+        return ResponseEntity.ok(newUser);
+    }
+}
