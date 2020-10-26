@@ -35,7 +35,7 @@ public class UserController {
         return String.format("Hello %s", name);
     }
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @RequestMapping(value = "/authenticate/login", method = RequestMethod.POST)
     public ResponseEntity<?> CreateAuthenticationToken(@RequestBody AuthenticationRequest request) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -51,7 +51,7 @@ public class UserController {
         return ResponseEntity.ok(new AuthenticationResponse(token,  expirationDate, userId));
     }
 
-    @PostMapping("/registerUser")
+    @PostMapping("/authenticate/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) throws  Exception {
         User newUser = userService.createUser(
                 request.getUsername(),
