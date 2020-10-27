@@ -8,6 +8,7 @@ import com.lian.joole.Security.MyUserDetailService;
 import com.lian.joole.Services.UserService;
 import com.lian.joole.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,8 +32,8 @@ public class UserController {
     private JwtUtil JwtUtil;
 
     @RequestMapping("/")
-    public String sayHello(@RequestParam(value = "myName", defaultValue = "World") String name){
-        return String.format("Hello %s", name);
+    public ResponseEntity<?> sayHello(@RequestParam(value = "myName", defaultValue = "World") String name){
+        return ResponseEntity.ok(String.format("Hello %s", name));
     }
 
     @RequestMapping(value = "/authenticate/login", method = RequestMethod.POST)
@@ -42,7 +43,10 @@ public class UserController {
                     request.getUsername(), request.getPassword()
             ));
         } catch (BadCredentialsException e) {
-            throw new Exception("Incorrect Username or password", e);
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            //throw new Exception("Incorrect Username or password", e);
+
+
         }
         final User userDetails = myUserDetailService.loadUserByUsername(request.getUsername());
         final String token = JwtUtil.generateToken(userDetails);
