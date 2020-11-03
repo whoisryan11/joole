@@ -44,6 +44,12 @@ public class Mechanical {
     private String application;
     @Column(name="mount")
     private String mount;
+    @Column(name="min_fan_speed")
+    private Integer minFanSpeed;
+    @Column(name="max_fan_speed")
+    private Integer maxFanSpeed;
+    @Column(name="accessories")
+    private String accessories;
     public Integer getId() {
         return id;
     }
@@ -186,5 +192,29 @@ public class Mechanical {
 
     public void setMount(String mount) {
         this.mount = mount;
+    }
+
+    public Integer getMinFanSpeed() {
+        return minFanSpeed;
+    }
+
+    public void setMinFanSpeed(Integer minFanSpeed) {
+        this.minFanSpeed = minFanSpeed;
+    }
+
+    public Integer getMaxFanSpeed() {
+        return maxFanSpeed;
+    }
+
+    public void setMaxFanSpeed(Integer maxFanSpeed) {
+        this.maxFanSpeed = maxFanSpeed;
+    }
+
+    public String getAccessories() {
+        return accessories;
+    }
+
+    public void setAccessories(String accessories) {
+        this.accessories = accessories;
     }
 }
